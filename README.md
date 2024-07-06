@@ -5,6 +5,6 @@
 </div>
 
 <p align="center">
-    <img src="https://blog.inforpro.com.br/wp-content/uploads/2021/05/Design-sem-nome-1-1200x650.jpg" width="700"/>
+    <img src="https://blog.inforpro.com.br/wp-content/uploads/2021/05/Design-sem-nome-1-1200x650.jpg" width="800"/>
 </p>
 
