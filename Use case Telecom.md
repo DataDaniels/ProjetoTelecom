@@ -26,11 +26,15 @@ Qual a largura de banda entre dispositivos?
 
 # Arquitetura das pipe-lines: Engenharia de dados para times de dados e negócios
 
+<p align="center">
+  <img src="https://drive.google.com/uc?export=view&id=17lpbbUrs5HXUGJ_p6bmot0bpKk7vtgE3" alt="Descrição da Imagem" style="width: 1200px;"/>
+</p>
+
 - Data Source: Os dados são originados em várias fontes.
 
-- IN é feito através das Aplicações de Devices: Os dados são capturados pelas aplicações nos dispositivos e enviados para a landing-zone.
+- INPUT é feito através das Aplicações de Devices: Os dados são capturados pelas aplicações nos dispositivos e enviados para a landing-zone.
 
-- Arquitetura Multi-Hope (Medallion)
+- PROCESS Arquitetura Multi-Hope (Medallion)
 
   - Landing-zone: Os dados recém-chegados são armazenados inicialmente na landing-zone.
 
@@ -40,13 +44,20 @@ Qual a largura de banda entre dispositivos?
 
   - Gold Zone (camada outro): Na última camada, os dados são refinados, agregados e otimizados para facilitar análises complexas e relatórios detalhados.
 
-- OUT pelo Databricks: neste projeto os dados são disponibilizados pelo Databrics porém isso pode ser feito por outras ferramentas como na imagem e os dados podem ser trabalhados em diversas ferramentas de visualização posteriormente.
+- OUTPUT pelo Databricks: neste projeto os dados são disponibilizados pelo Databrics porém isso pode ser feito por outras ferramentas como na imagem e os dados podem ser trabalhados em diversas ferramentas de visualização posteriormente.
 
 
-<p align="center">
+
+
+
+# Criando a estrutura do projeto
+## Criando as camadas - Landing-zone, bronze, prata, ouro
+
+```sql
+%sql
+CREATE DATABASE IF NOT EXISTS spark_catalog.bronze
+LOCATION 'dbfs/FileStore/bronze/';
+```
   <img src="https://drive.google.com/uc?export=view&id=17lpbbUrs5HXUGJ_p6bmot0bpKk7vtgE3" alt="Descrição da Imagem" style="width: 1200px;"/>
 </p>
-
-
-
 
