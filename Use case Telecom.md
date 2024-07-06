@@ -30,10 +30,6 @@ Qual a largura de banda entre dispositivos?
   <img src="https://drive.google.com/uc?export=view&id=17lpbbUrs5HXUGJ_p6bmot0bpKk7vtgE3" alt="1" style="width: 1200px;"/>
 </p>
 
-<p align="center">
-  <img src="https://drive.google.com/file/d/1-14W47bnAa5bX2xoaFyArtwAOLPjEw5r" alt="2" style="width: 1200px;"/>
-</p>
-
 - Data Source: Os dados são originados em várias fontes.
 
 - INPUT é feito através das Aplicações de Devices: Os dados são capturados pelas aplicações nos dispositivos e enviados para a landing-zone.
@@ -51,11 +47,6 @@ Qual a largura de banda entre dispositivos?
 - OUTPUT pelo Databricks: neste projeto os dados são disponibilizados pelo Databrics porém isso pode ser feito por outras ferramentas como na imagem e os dados podem ser trabalhados em diversas ferramentas de visualização posteriormente.
 
 # Criando a estrutura do projeto
-
-
-<p align="center">
-  <img src="https://drive.google.com/file/d/1-14W47bnAa5bX2xoaFyArtwAOLPjEw5r/view?usp=sharing" alt="2" style="width: 1200px;"/>
-</p>
 
 ```sql
 %sql
