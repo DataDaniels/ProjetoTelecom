@@ -26,6 +26,21 @@ Qual a largura de banda entre dispositivos?
 
 # Arquitetura das pipe-lines: Engenharia de dados para times de dados e negócios
 
+- Data Source: Os dados são originados em várias fontes.
+
+- IN é feito através das Aplicações de Devices: Os dados são capturados pelas aplicações nos dispositivos e enviados para a landing-zone.
+
+- Arquitetura Multi-Hope (Medallion)
+
+  - Landing-zone: Os dados recém-chegados são armazenados inicialmente na landing-zone.
+
+  - Bronze Zone (camada bronze): Nesta camada, os dados brutos da landing-zone são armazenados, mantendo sua integridade original.
+
+  - Silver Zone (camada prata): Os dados da bronze zone são processados e limpos para garantir qualidade e consistência, preparando-os para análises mais avançadas.
+
+  - Gold Zone (camada outro): Na última camada, os dados são refinados, agregados e otimizados para facilitar análises complexas e relatórios detalhados.
+
+- OUT pelo Databricks: neste projeto os dados são disponibilizados pelo Databrics porém isso pode ser feito por outras ferramentas como na imagem e os dados podem ser trabalhados em diversas ferramentas de visualização posteriormente.
 
 
 <p align="center">
