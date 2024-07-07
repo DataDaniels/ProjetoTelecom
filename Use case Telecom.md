@@ -48,9 +48,17 @@ Qual a largura de banda entre dispositivos?
 
 # Criando a estrutura do projeto
 
+## Criando o Cluster
+
+Para iniciar qualquer projeto em uma plataforma de cloud como a Databricks, é necessário criar um cluster que nada mais é do que nossa "máquina", o computador que será responsável por processar todo o projeto.
+
+![Criação Cluster](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/cluster.png)
+
+## Criação das camadas (Arquitetura MultiHop - Medallion)
+
 É necessário antes de tudo, criar as camadas ou seja, os bancos de dados que irão corresponder às camadas bronze, para e ouro.
 
-![Descrição da Imagem](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/bd_camadas.png?raw=true)
+![Arquitetura Multi-Hop](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/bd_camadas.png?raw=true)
 
 ```sql
 %sql
