@@ -48,9 +48,22 @@ Qual a largura de banda entre dispositivos?
 
 # Criando a estrutura do projeto
 
+É necessário antes de tudo, criar as camadas ou seja, os bancos de dados que irão corresponder às camadas bronze, para e ouro.
+
+![Descrição da Imagem](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/bd_camadas.png?raw=true)
+
 ```sql
 %sql
 CREATE DATABASE IF NOT EXISTS spark_catalog.bronze
 LOCATION 'dbfs/FileStore/bronze/';
 ```
-
+```sql
+%sql
+CREATE DATABASE IF NOT EXISTS spark_catalog.prata
+LOCATION 'dbfs/FileStore/prata/';
+```
+```sql
+%sql
+CREATE DATABASE IF NOT EXISTS spark_catalog.gold
+LOCATION 'dbfs/FileStore/ouro/';
+```
