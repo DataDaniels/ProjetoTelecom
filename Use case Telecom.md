@@ -174,4 +174,23 @@ def ingestion_gerar_dado(argument):
 ## Exemplo de uso
 #ingestion_gerar_dado('Computador_Conectado')
 ```
+## Gerando arquivos e realizando a ingestão 
 
+Através de nossa aplicação são gerados os arquivos e será necessário realizar este processo de acordo com cada tipo de dispositivo e seu status. E estes são, Celular Conectado e Desconectado, Computador Conectado e Desconectado. 
+Abaixo segue o código necessário para rodar nossa aplicação e realizar ingestão em nossa land-zone bem como a query SQL necessária para realizar a consulta e confirmar a ingestão dos arquivos.
+Obs.: para os demais tipos e status, será necessário substituir pelo desejado no código. 
+```python
+%run "./aplication"
+```
+```python
+import time as t
+
+while(True):
+    t.sleep(10)
+    ingestion_gerar_dado('Celular_Conectado')
+```
+Query SQL que realiza a consulta para verificar a quantidade de registros de celulares conectados em nossa landing zone.
+```sql
+%sql
+SELECT count(*) FROM parquet.`dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/`
+```
