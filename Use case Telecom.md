@@ -11,7 +11,7 @@ Ao analisar os dados, o engenheiro de dados descobriu que a empresa está enfren
 Diante desses desafios, o engenheiro de dados propôs uma atualização dos servidores para aumentar a capacidade de conexão e melhorar a qualidade do serviço. Ele também sugeriu a implementação de medidas para identificar e limitar o uso excessivo de largura de banda por parte de alguns clientes, garantindo uma experiência equitativa para todos os usuários da rede.
 
 
-# Principais perguntas de negócio a serem respondidas
+# Principais perguntas iniciais de negócio a serem respondidas
 
 Quantos dispositivos se conectaram e desconectaram em tempo real?
 
@@ -56,7 +56,7 @@ Para iniciar qualquer projeto em uma plataforma de cloud como a Databricks, é n
 
 ## Criação das camadas (Arquitetura MultiHop - Medallion)
 
-É necessário antes de tudo, criar as camadas ou seja, os bancos de dados que irão corresponder às camadas bronze, para e ouro.
+É necessário antes de tudo, criar as camadas ou seja, os bancos de dados que irão corresponder às camadas bronze, prata e ouro.
 
 ![Arquitetura Multi-Hop](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/bd_camadas.png?raw=true)
 
