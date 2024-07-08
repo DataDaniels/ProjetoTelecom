@@ -194,3 +194,5 @@ Query SQL que realiza a consulta para verificar a quantidade de registros de cel
 %sql
 SELECT count(*) FROM parquet.`dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/`
 ```
+
+--------continuar com as ingestões e depois realizar a carga na bronze--------------------
