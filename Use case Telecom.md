@@ -75,3 +75,103 @@ LOCATION 'dbfs/FileStore/prata/';
 CREATE DATABASE IF NOT EXISTS spark_catalog.gold
 LOCATION 'dbfs/FileStore/ouro/';
 ```
+
+## Criando aplicação: estrutura para gerar e organizar dados
+
+Nesta etapa veremos a criação de funções que serão responsáveis por gerar os arquivos que serão analisados posteriormente e organizá-los. É importante dizer que os dados são ficticios, foram gerados por uma Lib chamada Faker que gera dados falsos, simulando informações como nomes, endereços, números de telefone, e-mails, entre outros, de forma aleatória e realista.
+
+```python
+#Instalando a Lib de dados fake.
+!pip install Faker
+## https://faker.readthedocs.io/en/master/
+```
+```python
+#Importando as libs necessárias
+from faker import Faker
+import random
+from pyspark.dbutils import DBUtils
+from faker.providers import internet
+from datetime import datetime
+import pandas as pd
+import os
+```
+A função funcao_renomear é definida para mover arquivos Parquet de um diretório para outro. Ela itera sobre os arquivos em um diretório especificado (local), verifica se o nome do arquivo termina com .parquet, copia-o para um novo local (localnovo), e então remove o diretório original após a cópia. Finalmente, a função imprime onde o arquivo foi gerado no novo local.
+
+```python
+def funcao_renomear(local, localnovo):
+
+    from datetime import datetime
+
+    for file_name in dbutils.fs.ls(local):
+        file_name = file_name[0] #pega o nome somente
+        if file_name[-8:] == '.parquet': #se o final termina com .parquet
+            dbutils.fs.cp(file_name, localnovo) #move o parquet com outro nome para o lugar certo
+            dbutils.fs.rm(local, True) #apaga a pasta gerada
+
+    return print(f'Arquivo gerado em: {localnovo}')
+```
+
+Neste bloco abaixo são gerados dados fictícios usando a biblioteca Faker. A função gerar_dados cria uma lista de registros fictícios, cada um contendo nome, endereço, IP, hora de conexão, tipo de dispositivo, velocidade de conexão e status de conexão. Esses registros são convertidos em um DataFrame usando Pandas e depois em um DataFrame Spark. O DataFrame Spark é então salvo como arquivo Parquet na zona de aterrissagem (landing_zone). Após salvar, a função chama funcao_renomear (do Bloco 1) para renomear o arquivo Parquet recém-criado na landing-zone. A função gerar_dados retorna uma mensagem indicando o sucesso da operação e detalhes sobre o número de conexões, tipo de dispositivo, status e local do arquivo.
+
+```python
+#Gerando dados
+
+fake = Faker()
+fake.add_provider(internet)
+
+def gerar_dados(quantidade_conexao,dispositivo_de_acesso,status):
+# Criando Lista Vazia 
+    fake_records = []
+    velocidade_conexao = [1, 5, 10, 15, 25, 35, 50, 100, 200, 400, 500, 1000]
+
+# Gerando lista de dados fakes
+    for _ in range(quantidade_conexao):
+        novo_registro = {
+            'Nome': fake.name(),
+            'Endereco': fake.address(),
+            'Ip':fake.ipv4_private(),
+            'Hora_Conexao' : datetime.now(),
+            'Dispositivo_de_Acesso' : dispositivo_de_acesso,
+            'Velocidade_de_Conexao' : random.choice(velocidade_conexao),
+            'Status_Conexao' : status
+            }
+        fake_records.append(novo_registro)
+
+    # Criando Dataframe apartir dos dados gerados
+    df = pd.DataFrame.from_records(fake_records)
+    #convertendo pandas em dataframe spark
+    spark_df = spark.createDataFrame(df)
+    #salvando na landing_zone
+    try:
+        #Local de Geração do Path do arquivo gerado
+        Local = f"dbfs:/FileStore/landing_zone/{dispositivo_de_acesso}/{status}/{status}_{datetime.now()}"
+        #Gravar arquivo
+        spark_df.coalesce(1).write.format("parquet").mode("overwrite").save(Local)
+        #mover arquivo
+        local_novo = f"dbfs:/FileStore/landing_zone/{dispositivo_de_acesso}/{status}/{dispositivo_de_acesso}/{dispositivo_de_acesso}_{datetime.now()}.parquet"
+
+        funcao_renomear(Local,local_novo)
+
+        return print (f'Gerado com Sucesso = {quantidade_conexao} conexões de {dispositivo_de_acesso} | Status: {status} | Local do Arquivo: {Local}')
+    
+    except:
+        return print('Falha no processo! Função gerar_dados().')
+```
+A função ingestion_gerar_dado é definida para facilitar a chamada da função gerar_dados com base em um argumento específico. Ele usa um dicionário para mapear argumentos para diferentes chamadas de gerar_dados, cada uma configurada com parâmetros específicos para quantidade de conexões, tipo de dispositivo e status de conexão. Isso permite uma execução condicional e dinâmica com base no argumento fornecido à função.
+
+```python
+def ingestion_gerar_dado(argument):
+    switch_case = {
+        'Computador_Conectado': lambda: gerar_dados(40, 'Computador', 'Conectado'),
+        'Celular_Conectado': lambda: gerar_dados(80, 'Celular', 'Conectado'),
+        'Computador_Desconectado': lambda: gerar_dados(70, 'Computador', 'Desconectado'),
+        'Celular_Desconectado': lambda: gerar_dados(60, 'Celular', 'Desconectado')
+    }
+
+    # Executa a função correspondente ao argumento fornecido
+    switch_case.get(argument, lambda: print('Caso não encontrado!'))()
+
+## Exemplo de uso
+#ingestion_gerar_dado('Computador_Conectado')
+```
+
