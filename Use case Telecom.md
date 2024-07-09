@@ -194,6 +194,8 @@ Query SQL que realiza a consulta para verificar a quantidade de registros de cel
 %sql
 SELECT count(*) FROM parquet.`dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/`
 ```
+![Query camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/query%20landing%20zone.png)
+
 ## Ingestão e strutered streaming
 Para a ingestão e 
 
@@ -263,3 +265,4 @@ Query SQL para consultar os dados presentes na camada bronze após a ingestão
 %sql 
 select count (*) from bronze.celular_conectado
 ```
+![Query camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/query%20camada%20bronze.png)
