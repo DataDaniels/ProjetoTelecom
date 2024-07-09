@@ -357,3 +357,24 @@ Union all tabelas da camada bronze:
 Total de registros da camada prata, tabela unificada:
 
 ![Total registros prata](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/total%20registros%20prata%20unificada.png)
+
+# Arquitetura final do projeto: todas seus bancos de dados e suas camadas criados
+Bancos de dados e suas respectivas tabelas (camadas) devidamente criados.
+
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/database%20bronze.png" alt="1" style="width: 600px;"/>
+</p>
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/database%20prata.png" alt="1" style="width: 600px;"/>
+</p>
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/database%20ouro.png" alt="1" style="width: 600px;"/>
+</p>
+
+### Delta Logs
+Abaixo temos o delta_logs, neste caso da tabela prata unificada. Os arquivos delta_log são diretórios específicos usados pelo Delta Lake, uma extensão do formato Parquet que adiciona funcionalidades como controle de transações ACID (Atomicidade, Consistência, Isolamento e Durabilidade) e suporte a operações de merge e upsert. O diretório delta_log contém registros de transações e metadados que permitem a gestão de versões, rollbacks e outras operações relacionadas aos dados armazenados em Delta Lake.
+
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/delta_log.png" alt="1" style="width: 400px;"/>
+</p>
+
