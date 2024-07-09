@@ -174,11 +174,11 @@ def ingestion_gerar_dado(argument):
 ## Exemplo de uso
 #ingestion_gerar_dado('Computador_Conectado')
 ```
-## Gerando arquivos e realizando a ingestão 
+## Gerando arquivos na landing zone
 
 Através de nossa aplicação são gerados os arquivos e será necessário realizar este processo de acordo com cada tipo de dispositivo e seu status. E estes são, Celular Conectado e Desconectado, Computador Conectado e Desconectado. 
 Abaixo segue o código necessário para rodar nossa aplicação e realizar ingestão em nossa land-zone bem como a query SQL necessária para realizar a consulta e confirmar a ingestão dos arquivos.
-Obs.: para os demais tipos e status, será necessário substituir pelo desejado no código. 
+Obs.: para gerar dados com os demais tipos de dispositivo e seus status, será necessário substituir no código conforme o desejado. 
 ```python
 %run "./aplication"
 ```
@@ -194,5 +194,72 @@ Query SQL que realiza a consulta para verificar a quantidade de registros de cel
 %sql
 SELECT count(*) FROM parquet.`dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/`
 ```
+## Ingestão e strutered streaming
+Para a ingestão e 
 
---------continuar com as ingestões e depois realizar a carga na bronze--------------------
+```python
+import time as t
+
+while(True):
+    t.sleep(10)
+    ingestion_gerar_dado('Celular_Conectado')
+```#Importando apenas libs necessárias para essa execução 
+from datetime import *
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+from pyspark.sql.window import *
+from collections import OrderedDict ,Counter
+from functools import reduce 
+from pyspark.sql.streaming import * 
+from delta.tables import * 
+from itertools import chain
+```
+```python
+#Listando nosso DBFS, nosso "Storage"
+dbutils.fs.ls("dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/")
+```
+```python
+#Input
+origem_location = 'dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/' #origem do dado
+#Output
+destino_location = 'dbfs:/FileStore/bronze/Celular/Conectado/Celular/' #destino do dado
+tabela_destino = 'spark_catalog.bronze.celular_conectado' # destino tabela acesso
+checkpoint = 'dbfs:/FileStore/bronze/Celular/Conectado/Celular_chk/' # Definir o diretório de checkpoint
+schema = 'dbfs:/FileStore/bronze/Celular/Conectado/Celular_schema/' # Definir o Local do meu schema
+source = 'Celular Conectado'
+```
+```python
+#Lendo os microbatch novos para o streaming
+streamingDF = (spark.readStream.format('cloudFiles')\
+    .option('cloudFiles.Format', 'parquet')\
+    .option('cloudFiles.inferColumnTypes', 'true')\
+    .option('cloudFiles.schemaLocation', schema)\
+    .option('cloudFiles.schemaEvolutionMode', 'addNewColumns')\
+    .load(origem_location)\
+     #Adicionando o caminho do arquivo fonte da ingestão   
+     .withColumn('rastreamento_source',input_file_name())\
+     #Adicionando a fonte da informação 
+     .withColumn('source',lit(source)) \
+     #Adicionando a data/hora do arquivo da fonte 
+     .withColumn("data_arquivo_ingestao", col("_metadata.file_modification_time")) \
+     #Adicionando um campo extra, caso seja necessário futuramente criar flag    
+     .withColumn('status',lit(True)))
+```
+```python
+# Escrever o stream de dados processados em outro diretório
+query = (streamingDF 
+    .writeStream
+    # .queryName("spark_catalog.bronze.celular_conectado") #Nome da Tabela de saida
+    .format("delta")  # Formato de dados de saída
+    .outputMode("append")   # Modo de saída (append, complete, update)
+    .option("checkpointLocation", checkpoint)   # Localização do checkpoint
+    .option("path", destino_location)   # Diretório de saída
+    .trigger(availableNow=True) #Processa tudo que tem para processar e termina a execução
+    .table(tabela_destino)
+)
+```
+Query SQL para consultar os dados presentes na camada bronze após a ingestão
+```sql
+%sql 
+select count (*) from bronze.celular_conectado
+```
