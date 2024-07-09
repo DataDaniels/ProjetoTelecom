@@ -266,3 +266,15 @@ Query SQL para consultar os dados presentes na camada bronze após a ingestão
 select count (*) from bronze.celular_conectado
 ```
 ![Query camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/5aff8dc912ae278d0e6253f3b3dfa4ed1d6ecf2e/query%20camada%20bronze%20count.png)
+
+## Habilitando o Change Data Feed (CDF)
+
+O Change Data Feed (CDF) é uma funcionalidade que permite capturar e registrar mudanças em dados de um banco de dados em tempo real ou quase real. Ele monitora operações como inserções, atualizações e exclusões, armazenando essas alterações em um log de mudanças. O CDF é útil para replicação de dados, sincronização entre sistemas e auditoria, proporcionando atualizações eficientes sem a necessidade de varrer todas as linhas de uma tabela para identificar mudanças. 
+
+```sql
+%sql
+-- Habilitando o CDF(Change Data Feed para todas as tabelas)
+set spark.databricks.delta.properties.defaults.enableChangeDataFeed = true;
+```
+![Habilitando CDF](https://github.com/DataDaniels/imagensprojetotelecom/blob/51a2e3fe7c9df3cc24b1c7f5338f9e6e55e7ced7/Habilitando%20CDF%20.png)
+
