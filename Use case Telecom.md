@@ -13,13 +13,15 @@ Diante desses desafios, o engenheiro de dados propôs uma atualização dos serv
 
 # Principais perguntas iniciais de negócio a serem respondidas
 
+Qual é a quantidade de registros até o momento da análise?
+
 Quantos dispositivos se conectaram e desconectaram em tempo real?
 
-Quantos dispositivos se conectaram nos últimos 10 minutos?
+Quantos dispositivos se conectaram nos ultimos 120 minutos?
 
-Qual a Largura de banda em uso em tempo real?
+Qual a Taxa de Banda em uso em tempo real?
 
-Qual a taxa de cliente de alta conexão conectados?
+Qual a taxa de clientes de alta conexão conectados?
 
 Qual a largura de banda entre dispositivos?
 
@@ -377,4 +379,33 @@ Abaixo temos o delta_logs, neste caso da tabela prata unificada. Os arquivos del
 <p align="left">
   <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/delta_log.png" alt="1" style="width: 400px;"/>
 </p>
+
+# Respondendo às perguntas de negócio:
+
+Qual é a quantidade de registros até o momento da análise?
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/total%20de%20registros%20momento%20analise.png" alt="1" style="width: 800px;"/>
+</p>
+Quantos dispositivos se conectaram e desconectaram em tempo real?
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/dispositivos%20em%20tempo%20real.png" alt="1" style="width: 800px;"/>
+</p>
+Quantos dispositivos se conectaram nos ultimos 120 minutos?
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/dispositivos%20em%20tempo%20real.png" alt="1" style="width: 800px;"/>
+</p>
+Qual a Taxa de Banda em uso em tempo real?
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/dispositivos%20em%20tempo%20real.png" alt="1" style="width: 800px;"/>
+</p>
+Qual a taxa de clientes de alta conexão conectados?
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/Banda%20em%20tempo%20real.png" alt="1" style="width: 800px;"/>
+</p>
+Qual a largura de banda entre dispositivos?
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/largura%20da%20banda%20entre%20dispositivos.png" alt="1" style="width: 800px;"/>
+</p>
+
+
 
