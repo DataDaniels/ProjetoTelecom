@@ -265,4 +265,4 @@ Query SQL para consultar os dados presentes na camada bronze após a ingestão
 %sql 
 select count (*) from bronze.celular_conectado
 ```
-![Query camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/ccb77ae926e7166c3952098f9c4596d5aa2ec8a9/query%20camada%20bronze%20count.png)
+![Query camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/5aff8dc912ae278d0e6253f3b3dfa4ed1d6ecf2e/query%20camada%20bronze%20count.png)
