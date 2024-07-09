@@ -360,6 +360,34 @@ Total de registros da camada prata, tabela unificada:
 
 ![Total registros prata](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/total%20registros%20prata%20unificada.png)
 
+## Criando a camada ouro
+A camada Ouro (Gold Layer) é a fase final do pipeline de dados, onde os dados são refinados e organizados em tabelas otimizadas para análise e relatórios. Essas tabelas geralmente são agregadas e enriquecidas para suportar decisões de negócios e análises avançadas.
+```sql
+%sql
+--Qual a largura de banda entre dispositivos?
+CREATE OR REPLACE TABLE gold.larguraBandaDispositivos
+LOCATION 'dbfs:/FileStore/gold/larguraBandaDispositivos'
+
+select source , sum(Velocidade_de_Conexao) soma_largura_de_banda, current_timestamp as data_disponibilizacao
+from prata.conexao_unificado
+group by source
+```
+```sql
+%sql
+
+CREATE OR REPLACE TABLE gold.taxaBandaLarga
+LOCATION 'dbfs:/FileStore/gold/taxaBandaLarga'
+
+-- Qual a Taxa de Banda em uso em tempo real?"O que tempo real para o negócio"?!
+SELECT 
+  sum(Velocidade_de_Conexao) soma_largura_de_banda
+FROM prata.conexao_unificado
+WHERE 
+  Hora_Conexao >= (CURRENT_TIMESTAMP - INTERVAL '120' MINUTE)
+  and status_conexao='Conectado'
+GROUP BY all
+```
+
 # Arquitetura final do projeto: todas seus bancos de dados e suas camadas criados
 Bancos de dados e suas respectivas tabelas (camadas) devidamente criados.
 
