@@ -174,7 +174,7 @@ def ingestion_gerar_dado(argument):
 ## Exemplo de uso
 #ingestion_gerar_dado('Computador_Conectado')
 ```
-## Gerando arquivos na landing zone
+# Gerando arquivos na landing zone
 
 Através de nossa aplicação são gerados os arquivos e será necessário realizar este processo de acordo com cada tipo de dispositivo e seu status. E estes são, Celular Conectado e Desconectado, Computador Conectado e Desconectado. 
 Abaixo segue o código necessário para rodar nossa aplicação e realizar ingestão em nossa land-zone bem como a query SQL necessária para realizar a consulta e confirmar a ingestão dos arquivos.
@@ -196,8 +196,8 @@ SELECT count(*) FROM parquet.`dbfs:/FileStore/landing_zone/Celular/Conectado/Cel
 ```
 ![Query camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/query%20landing%20zone.png)
 
-## Ingestão e strutered streaming
-Para a ingestão e 
+# Camada Bronze: Ingestão e strutered streaming
+Os blocos de código abaixo 
 
 ```python
 import time as t
@@ -205,7 +205,10 @@ import time as t
 while(True):
     t.sleep(10)
     ingestion_gerar_dado('Celular_Conectado')
-```#Importando apenas libs necessárias para essa execução 
+```
+Importa diversas bibliotecas necessárias para a execução, incluindo funções e tipos do PySpark, manipulação de streams, tabelas Delta, e outras utilidades.
+```python
+#Importando apenas libs necessárias para essa execução 
 from datetime import *
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
@@ -216,10 +219,12 @@ from pyspark.sql.streaming import *
 from delta.tables import * 
 from itertools import chain
 ```
+Lista os arquivos presentes no diretório especificado no DBFS (Databricks File System), que é usado como armazenamento.
 ```python
 #Listando nosso DBFS, nosso "Storage"
 dbutils.fs.ls("dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/")
 ```
+Define as localizações de origem e destino dos dados, a tabela de destino para acesso, o diretório de checkpoint, o esquema e a fonte dos dados.
 ```python
 #Input
 origem_location = 'dbfs:/FileStore/landing_zone/Celular/Conectado/Celular/' #origem do dado
@@ -230,6 +235,7 @@ checkpoint = 'dbfs:/FileStore/bronze/Celular/Conectado/Celular_chk/' # Definir o
 schema = 'dbfs:/FileStore/bronze/Celular/Conectado/Celular_schema/' # Definir o Local do meu schema
 source = 'Celular Conectado'
 ```
+Lê novos microbatches de dados em streaming no formato Parquet da localização de origem, adiciona colunas para rastreamento de arquivos, fonte da informação, data/hora de modificação e um status.
 ```python
 #Lendo os microbatch novos para o streaming
 streamingDF = (spark.readStream.format('cloudFiles')\
@@ -247,6 +253,7 @@ streamingDF = (spark.readStream.format('cloudFiles')\
      #Adicionando um campo extra, caso seja necessário futuramente criar flag    
      .withColumn('status',lit(True)))
 ```
+Escreve o stream de dados processados em um diretório Delta especificado, utilizando o modo append, configurando o checkpoint, e definindo o processamento até terminar tudo que está disponível.
 ```python
 # Escrever o stream de dados processados em outro diretório
 query = (streamingDF 
@@ -267,9 +274,10 @@ select count (*) from bronze.celular_conectado
 ```
 ![Query camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/5aff8dc912ae278d0e6253f3b3dfa4ed1d6ecf2e/query%20camada%20bronze%20count.png)
 
-## Habilitando o Change Data Feed (CDF)
+# Habilitando o Change Data Feed (CDF)
 
 O Change Data Feed (CDF) é uma funcionalidade que permite capturar e registrar mudanças em dados de um banco de dados em tempo real ou quase real. Ele monitora operações como inserções, atualizações e exclusões, armazenando essas alterações em um log de mudanças. O CDF é útil para replicação de dados, sincronização entre sistemas e auditoria, proporcionando atualizações eficientes sem a necessidade de varrer todas as linhas de uma tabela para identificar mudanças. 
+No código SQL abaixo, habilitei o CDF para todas as tabelas.
 
 ```sql
 %sql
@@ -278,3 +286,74 @@ set spark.databricks.delta.properties.defaults.enableChangeDataFeed = true;
 ```
 ![Habilitando CDF](https://github.com/DataDaniels/imagensprojetotelecom/blob/51a2e3fe7c9df3cc24b1c7f5338f9e6e55e7ced7/Habilitando%20CDF%20.png)
 
+## Estruturação da camada Prata
+
+Este código lê dados de uma tabela Delta em tempo real, ignora exclusões, e classifica os registros com base na coluna "Velocidade_de_Conexao" em três categorias: "Baixa Velocidade", "Média Velocidade" e "Alta Velocidade". O mesmo processo será utilizado para os quatro tipos de dispositivos e seus status. 
+
+```python
+#Computador conectado
+
+tabela_origem = 'spark_catalog.bronze.computador_conectado'
+df_readStream_computador_conectado = (spark.readStream
+                                            .format("delta")
+                                            .option("ignoreDeletes", "true")
+                                            .table(tabela_origem)
+                                            .withColumn("Classificacao",when(col("Velocidade_de_Conexao").between(0, 20), "Baixa Velocidade")
+                                                                       .when(col("Velocidade_de_Conexao").between(21, 100), "Média Velocidade")
+                                                                       .otherwise("Alta Velocidade"))
+                                            )
+```
+### Unificando dataframes de batch novos
+Este código realiza a união de múltiplos DataFrames de streaming (df_readStream_computador_conectado, df_readStream_celular_conectado, df_readStream_computador_desconectado, df_readStream_celular_desconectado) com base no nome das colunas, permitindo colunas ausentes, e retorna um DataFrame unificado sem duplicatas.
+```python
+#fazendo o union all de todos os dataframes pelo nome da coluna
+dfs_individuais = [ df_readStream_computador_conectado
+                   ,df_readStream_celular_conectado
+                   ,df_readStream_computador_desconectado
+                   ,df_readStream_celular_desconectado]
+
+def union_all(dfs):
+    if len(dfs) > 1:
+        return dfs[0].unionByName(union_all(dfs[1:]), allowMissingColumns=True).distinct()
+    else:
+        return dfs[0].distinct()
+
+df_all = union_all(dfs_individuais)
+```
+### Gravando na camada prata com streaming
+Este código grava o DataFrame unificado df_all em um local de destino no formato Delta, utilizando o modo de saída "append". Ele configura um diretório de checkpoint, define o caminho de destino para armazenar os dados e escreve os dados na tabela especificada (spark_catalog.prata.conexao_unificado).
+```python
+# Gravar no destino
+tabela_destino = 'spark_catalog.prata.conexao_unificado'
+chekpoint = 'dbfs:/FileStore/prata/conexao_unificada_chk'
+destino_location = 'dbfs:/FileStore/prata/conexao_unificada'
+
+( df_all.writeStream
+  .format("delta")
+  .outputMode("append")
+  .option("checkpointLocation", chekpoint)
+  .option("path", destino_location)
+  .trigger(availableNow=True)
+  .table(tabela_destino)
+)
+```
+Query SQL que exibe todos os registros existentes na tabela prata, tabela decorrente da unificação das tabelas da camada bronze.
+As duas formas de consulta exibem o mesmo resultado, a primeira busca no catálogo através do Spark SQL e a segunda já acessa diretamente o banco de dados através do SQL puro. 
+```sql
+%sql
+select * from spark_catalog.prata.conexao_unificado
+```
+```sql
+%sql
+select * from prata.conexao_unificado
+```
+![Colunas prata unificada](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/tabela%20prata%20todos.png)
+
+Com as queries abaixo é possível verificar que a quantidade de registros foram entre as duas tabelas são idênticas.
+
+Union all tabelas da camada bronze:
+![Union all camada bronze](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/union%20all%20camada%20prata.png)
+
+Total de registros da camada prata, tabela unificada:
+
+![Total registros prata](https://github.com/DataDaniels/imagensprojetotelecom/blob/main/total%20registros%20prata%20unificada.png)
