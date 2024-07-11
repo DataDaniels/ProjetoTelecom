@@ -358,31 +358,26 @@ Total de registros da camada prata, tabela unificada:
 
 ## Criando a camada ouro
 A camada Ouro (Gold Layer) é a fase final do pipeline de dados, onde os dados são refinados e organizados em tabelas otimizadas para análise e relatórios. Essas tabelas geralmente são agregadas e enriquecidas para suportar decisões de negócios e análises avançadas.
-```sql
-%sql
---Qual a largura de banda entre dispositivos?
-CREATE OR REPLACE TABLE gold.larguraBandaDispositivos
-LOCATION 'dbfs:/FileStore/gold/larguraBandaDispositivos'
 
-select source , sum(Velocidade_de_Conexao) soma_largura_de_banda, current_timestamp as data_disponibilizacao
-from prata.conexao_unificado
-group by source
-```
-```sql
-%sql
+### Respondendo às perguntas de negócio (criando tabelas na ouro)
 
-CREATE OR REPLACE TABLE gold.taxaBandaLarga
-LOCATION 'dbfs:/FileStore/gold/taxaBandaLarga'
+Quantos dispositivos se conectaram e desconectaram em tempo real? 
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/Quantos%20dispositivos%20se%20conectaram%20em%20tempo%20real.jpeg" alt="1" style="width: 800px;"/>
+</p>
+Qual a Taxa de Banda em uso em tempo real? 
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/Qual%20%C3%A9%20a%20taxa%20de%20banda%20em%20uso%20em%20tempo%20real.jpeg" alt="1" style="width: 800px;"/>
+</p>
+Qual a taxa de clientes de alta conexão conectados? 
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/Qual%20%C3%A9%20a%20taxa%20de%20clientes%20de%20alta%20conexao%20conectados.jpeg" alt="1" style="width: 800px;"/>
+</p>
+Qual a largura de banda entre dispositivos? 
+<p align="left">
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/Qual%20a%20largura%20da%20banda%20entre%20dispositivos.jpeg" alt="1" style="width: 800px;"/>
+</p>
 
--- Qual a Taxa de Banda em uso em tempo real?"O que tempo real para o negócio"?!
-SELECT 
-  sum(Velocidade_de_Conexao) soma_largura_de_banda
-FROM prata.conexao_unificado
-WHERE 
-  Hora_Conexao >= (CURRENT_TIMESTAMP - INTERVAL '120' MINUTE)
-  and status_conexao='Conectado'
-GROUP BY all
-```
 
 # Arquitetura final do projeto: todas seus bancos de dados e suas camadas criados
 Bancos de dados e suas respectivas tabelas (camadas) devidamente criados.
@@ -394,7 +389,7 @@ Bancos de dados e suas respectivas tabelas (camadas) devidamente criados.
   <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/database%20prata.png" alt="1" style="width: 600px;"/>
 </p>
 <p align="left">
-  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/database%20ouro.png" alt="1" style="width: 600px;"/>
+  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/Tabelas%20camada%20ouro.jpeg" alt="1" style="width: 600px;"/>
 </p>
 
 ### Delta Logs
@@ -403,25 +398,3 @@ Abaixo temos o delta_logs, neste caso da tabela prata unificada. Os arquivos del
 <p align="left">
   <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/delta_log.png" alt="1" style="width: 400px;"/>
 </p>
-
-# Respondendo às perguntas de negócio:
-
-Quantos dispositivos se conectaram e desconectaram em tempo real? 1
-<p align="left">
-  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/dispositivos%20em%20tempo%20real.png" alt="1" style="width: 800px;"/>
-</p>
-Qual a Taxa de Banda em uso em tempo real? 2
-<p align="left">
-  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/dispositivos%20em%20tempo%20real.png" alt="1" style="width: 800px;"/>
-</p>
-Qual a taxa de clientes de alta conexão conectados? 3
-<p align="left">
-  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/Banda%20em%20tempo%20real.png" alt="1" style="width: 800px;"/>
-</p>
-Qual a largura de banda entre dispositivos? 4
-<p align="left">
-  <img src="https://github.com/DataDaniels/imagensprojetotelecom/blob/main/largura%20da%20banda%20entre%20dispositivos.png" alt="1" style="width: 800px;"/>
-</p>
-
-
-
